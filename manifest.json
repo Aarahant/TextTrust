@@ -1,0 +1,30 @@
+{
+  "manifest_version": 2,
+
+  "name": "TextTrust",
+  "description": "Revisar la confiabilidad de los artículos en línea",
+  "version": "1.0",
+
+  "browser_action":{
+    "default_icon": "ttIcon.png",
+    "default_title": "Revisar artículo",
+    "default_popup": "menu.html"
+  },
+
+  "permissions": [
+    "activeTab",
+    "http://*/",
+    "https://*/"
+  ],
+
+  "web_accessible_resources": ["pastillita.jpg", "testObj.json", "test2Obj.json"],
+
+  "background":{
+    "page": "bg.html"
+  },
+  "icons":{
+    "48": "ttIcon.png"
+  }
+
+
+}
