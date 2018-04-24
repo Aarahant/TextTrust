@@ -61,11 +61,48 @@ document.addEventListener("DOMContentLoaded", function(){
 chrome.runtime.onMessage.addListener(function(req, sender, sendResponse){
 
   //console.log(req.lol);
+  var data = req.data;
+  var puntuacion = 0;
+  if(data["author"] != null){
 
-  for(var name in req.data){
-
-    s("found").innerHTML += " " + name + ": " + req.data[name] + "<br>";
+    puntuacion += 5;
+    s("p_autor").innerHTML = data["author"];
 
   }
+
+  if(data["date_published"] != null){
+
+    puntuacion += 5;
+    s("p_fecha").innerHTML = data["date_published"];
+
+  }
+
+  s("p_dominio").innerHTML = data["domain"];
+  if(data["domain"] == "gov"){
+
+    puntuacion += 5;
+
+
+  }
+
+  if(data["adje"] == undefined){
+
+    s("p_adj").innerHTML = "No se tienen las suficientes palabras para obtener porcentaje de adjetivación";
+
+  }else{
+
+    s("p_adj").innerHTML = data["adje"];
+
+  }
+
+
+  if(data["adje"]<10){
+
+    puntuacion += 5;
+
+
+  }
+
+  s("p_punt").innerHTML = puntuacion;
 
 });

@@ -91,6 +91,16 @@ function extractHostname(url) {
     return hostname;
 }
 
+function getDomain(url){
+
+  var host = extractHostname(url);
+  var aHost = host.split(".");
+
+  artData["domain"] = aHost[aHost.length-1];
+
+
+}
+
 function extractRootDomain(url) {
     var domain = extractHostname(url),
         splitArr = domain.split('.'),
@@ -132,7 +142,7 @@ function getAutor(){
     if(regAutor.test(aClass) || regAutor.test(id) && !regAutor.test(domain) && !regAutor.test("staff")){
 
       //chrome.runtime.sendMessage({found:true, au:elements[i].innerHTML});
-      artData["author"] = elements[i].innerHTML;
+      artData["author"] = delHtml(elements[i].innerHTML);
       f = true;
 
     }
@@ -169,6 +179,12 @@ function getTitle(){
   }
 
   //chrome.runtime.sendMessage({found:false});
+
+
+}
+
+function getContact(){
+
 
 
 }
@@ -213,7 +229,7 @@ function allData(){
       artData = JSON.parse(this.responseText);
       functionSet();
       console.log(artData);
-      chrome.runtime.sendMessage({data: artData});
+
 
     }
 
@@ -250,6 +266,7 @@ function delHtml(sHtml){
 }
 var g = "lol";
 function getAdjPercent(conll){
+
   var total_words = 0;
   var total_adj = 0;
   var ismo = /isimo|isima|ísimo|ísima/g;
@@ -282,7 +299,8 @@ function getAdjPercent(conll){
   }
 
   var perc = (total_adj/total_words)*100;
-  console.log(perc);
+  artData["adje"] = perc;
+  chrome.runtime.sendMessage({data: artData});
 
 
 }
@@ -326,6 +344,9 @@ function functionSet(){
   getTitle();
   getFecha();
   getBody();
+  getDomain(location.href);
+  parseParagraph();
+
 }
 
 function testParseObj(){
@@ -350,4 +371,4 @@ function testParseObj(){
 
 //allData();getBody();
 //console.log(artData);
-testParseObj();
+allData();
