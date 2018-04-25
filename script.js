@@ -42,6 +42,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
   s("button").addEventListener("click", function(){
     console.log("Sí funciona");
+    s("gify").style.display = "block";
     chrome.tabs.executeScript(null, {
 
       file: "pasti.js"
@@ -61,6 +62,7 @@ document.addEventListener("DOMContentLoaded", function(){
 chrome.runtime.onMessage.addListener(function(req, sender, sendResponse){
 
   //console.log(req.lol);
+  s("gify").style.display = "none";
   var data = req.data;
   var puntuacion = 0;
   if(data["author"] != null){
@@ -77,8 +79,9 @@ chrome.runtime.onMessage.addListener(function(req, sender, sendResponse){
 
   }
 
-  s("p_dominio").innerHTML = data["domain"];
-  if(data["domain"] == "gov"){
+  s("p_dominio").innerHTML = "El dominio es propiedad de una entidad gubernamental";
+
+  if(data["domain"]){
 
     puntuacion += 5;
 
@@ -100,6 +103,51 @@ chrome.runtime.onMessage.addListener(function(req, sender, sendResponse){
 
     puntuacion += 5;
 
+
+  }
+
+  console.log(data);
+  if(data["contacto"]["conocido"] || data["contacto"]["red"].length>0){
+
+    if(data["contacto"]["conocido"] && data["contacto"]["red"].length>0){
+
+      puntuacion += 5;
+
+    }else{
+
+      puntuacion += 3;
+
+    }
+
+    if(data["contacto"]["conocido"]){
+
+      s("p_contacto").innerHTML += "El sitio es conocido <br>";
+
+    }
+
+    if(data["contacto"]["red"].length>0){
+
+      s("p_contacto").innerHTML += "Tiene las siguientes redes sociales: <br>";
+
+      for(var i = 0; i<data["contacto"]["red"].length; i++){
+
+        s("p_contacto").innerHTML += data["contacto"]["red"][i] + "<br>";
+
+      }
+
+    }
+
+  }
+
+  if(data["ints"].length>0){
+
+    puntuacion += 5;
+
+    for(var i = 0; i<data["ints"].length; i++){
+
+      s("p_ints").innerHTML += data["ints"][i];
+
+    }
 
   }
 

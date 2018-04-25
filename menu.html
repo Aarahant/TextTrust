@@ -14,6 +14,12 @@
         width:100%;
 
       }
+
+      #gify{
+
+        display:none;
+
+      }
     </style>
     <script src="script.js">
 
@@ -29,11 +35,11 @@
       TextTrust es una extensión que analiza artículos en línea con el propósito
       de detectar noticias tendenciosas
     </p>
-    Analizar la siguiente página:<br>
-    <input type="text" id="url" ><br>
+    <!--Analizar la siguiente página:<br>
+    <input type="text" id="url" ><br>-->
     Analizar página actual<br>
-    <input type="button" id="button" value="Analizar not"><br>
-    <div id="found"></div>
+    <input type="button" id="button" value="Analizar nota"><br>
+    <img src="loading.gif" id="gify">
     Autor:
     <hr/>
     <div id="p_autor"></div><br>
@@ -43,9 +49,15 @@
     Dominio:
     <hr/>
     <div id="p_dominio"></div><br>
-    Porcentaje de adjetivación: 
+    Contacto:
+    <hr/>
+    <div id="p_contacto"></div><br>
+    Porcentaje de adjetivación:
     <hr/>
     <div id="p_adj"></div><br>
+    Intertextualidades:
+    <hr/>
+    <div id="p_ints"></div><br>
     Puntuación de la noticia:
     <hr/>
     <div id="p_punt"></div><br>

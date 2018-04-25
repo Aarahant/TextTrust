@@ -72,6 +72,20 @@ switch(option){
 }
 */
 var artData = {};
+
+function elExist(array, element){
+
+  if(array.indexOf(element)>-1){
+
+    return true;
+
+  }else{
+
+    return false;
+
+  }
+
+}
 function extractHostname(url) {
     var hostname;
     //find & remove protocol (http, ftp, etc.) and get hostname
@@ -94,9 +108,9 @@ function extractHostname(url) {
 function getDomain(url){
 
   var host = extractHostname(url);
-  var aHost = host.split(".");
+  var testGob = /gob|gov/i;
 
-  artData["domain"] = aHost[aHost.length-1];
+  artData["domain"] = testGob.test(host);
 
 
 }
@@ -128,29 +142,33 @@ function getAutor(){
 
   var elements = document.getElementsByTagName('*');
   var regAutor = /autor|author/g;
-  var domain = extractRootDomain(location.href);
+  var forbWords = /redacción|redaccion|staff|personal/i;
+  var domain = extractHostname(location.href);
   var f = false;
+  var prevAut = artData["author"];
 
-  if(artData["author"] != null && !regAutor.test(domain))
-    return;
 
   for(var i = 0; i<elements.length; i++){
 
     var aClass = elements[i].className || "";
     var id = elements[i].id || "";
 
-    if(regAutor.test(aClass) || regAutor.test(id) && !regAutor.test(domain) && !regAutor.test("staff")){
+    if(regAutor.test(aClass) || regAutor.test(id) && !regAutor.test(domain) && !regAutor.test("staff") && !forbWords.test(artData["author"])){
 
       //chrome.runtime.sendMessage({found:true, au:elements[i].innerHTML});
       artData["author"] = delHtml(elements[i].innerHTML);
-      f = true;
+      return;
 
     }
 
   }
 
-  if(!f)
+  if(!f){
+
     artData["author"] = null;
+
+  }
+
 
   //chrome.runtime.sendMessage({found:false});
 
@@ -185,7 +203,83 @@ function getTitle(){
 
 function getContact(){
 
+  var elements = document.getElementsByTagName('*');
+  var regAutor = /redes-sociales|social|facebook|twitter|instagram|linkedin|fb|tw/g;
+  var fb = /facebook|fb/i;
+  var twi = /twitter|tw/i;
+  var inst = /instagram/i;
+  var linked = /linkedin/i;
+  var famous = /universal|norte|reforma|economista/i;
+  artData["contacto"] ={};
+  artData["contacto"]["red"] = [];
+  for(var i = 0; i<elements.length; i++){
 
+    var aClass = elements[i].className || "";
+    var id = elements[i].id || "";
+    var domain = extractHostname(location.href);
+    if(regAutor.test(aClass) || regAutor.test(id) && regAutor.test(elements[i].innerHTML)){
+
+      //chrome.runtime.sendMessage({found:true, au:elements[i].innerHTML});
+
+      if(fb.test(elements[i].innerHTML) || fb.test(aClass) || fb.test(id)){
+
+        if(!elExist(artData["contacto"]["red"], "Facebook")){
+
+          artData["contacto"]["red"].push("Facebook");
+
+        }
+
+
+      }
+
+      if(twi.test(elements[i].innerHTML) || twi.test(aClass) || twi.test(id)){
+
+        if(!elExist(artData["contacto"]["red"], "Twitter")){
+
+          artData["contacto"]["red"].push("Twitter");
+
+        }
+
+
+      }
+
+      if(inst.test(elements[i].innerHTML) || inst.test(aClass) || inst.test(id)){
+
+        if(!elExist(artData["contacto"]["red"], "Instagram")){
+
+          artData["contacto"]["red"].push("Instagram");
+
+        }
+
+
+      }
+
+      if(linked.test(elements[i].innerHTML) || inst.test(aClass) || inst.test(id)){
+
+        if(!elExist(artData["contacto"]["red"], "Linkedin")){
+
+          artData["contacto"]["red"].push("Linkedin");
+
+        }
+
+
+      }
+
+
+
+    }
+
+    if(famous.test(domain)){
+
+      artData["contacto"]["conocido"] = true;
+
+    }else{
+
+      artData["contacto"]["conocido"] = false;
+
+    }
+
+  }
 
 }
 
@@ -206,6 +300,7 @@ function getFecha(){
 
       //chrome.runtime.sendMessage({found:true, au:elements[i].innerHTML});
       artData["date_published"] = elements[i].innerHTML;
+      return;
 
     }
 
@@ -228,7 +323,7 @@ function allData(){
 
       artData = JSON.parse(this.responseText);
       functionSet();
-      console.log(artData);
+      //console.log(artData);
 
 
     }
@@ -257,7 +352,7 @@ function delHtml(sHtml){
 
   var nonReg = /<([^>]+)>/g;
   var quitScript = /<script>.+<\/script>/g;
-  var quitSpan = /<span .+>.+<\/span>/g;
+  var quitSpan = /<span .+>.+<\/span>/gs;
 
   var unscripted = sHtml.replace(quitScript, "");
   var unspanned = unscripted.replace(quitSpan, "");
@@ -319,7 +414,7 @@ function parseParagraph(){
 
     if (this.readyState == 4 && this.status == 200){
 
-      console.log(this.responseText);
+      //console.log(this.responseText);
       getAdjPercent(JSON.parse(this.responseText));
 
     }
@@ -338,12 +433,33 @@ function parseParagraph(){
 
 }
 
+function getInts(){
+
+  var els = document.querySelectorAll("p a");
+  artData["ints"] = [];
+  var domain =  extractHostname(location.href);
+  var reDomain = new RegExp(domain+"|^\/.+$|#", "gi");
+  for(var i = 0; i<els.length; i++){
+
+    if(!reDomain.test(els[i].href)){
+
+      artData["ints"].push(els[i].href);
+
+    }
+
+
+  }
+
+}
+
 function functionSet(){
 
   getAutor();
   getTitle();
   getFecha();
   getBody();
+  getContact();
+  getInts();
   getDomain(location.href);
   parseParagraph();
 
